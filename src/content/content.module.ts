@@ -5,6 +5,6 @@ import { contentsProviders } from './entities/content.provider';
 
 @Module({
   controllers: [ContentController],
-  providers: [ContentService, ...contentsProviders],
+  providers: [...contentsProviders, ContentService],
 })
 export class ContentModule {}

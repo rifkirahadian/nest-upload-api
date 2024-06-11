@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { ContentService } from './content.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { fileFilter, storage } from 'src/utils/file';
+import { fileFilter, storage } from '../utils/file';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 
 @Controller('content')
