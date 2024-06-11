@@ -1,17 +1,11 @@
 import {
   Controller,
-  Get,
   Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
   UseInterceptors,
   UploadedFile,
   BadRequestException,
 } from '@nestjs/common';
 import { ContentService } from './content.service';
-import { UpdateContentDto } from './dto/update-content.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { fileFilter, storage } from 'src/utils/file';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
@@ -42,33 +36,17 @@ export class ContentController {
     },
   })
   @ApiConsumes('multipart/form-data')
-  create(@UploadedFile() file) {
+  async create(@UploadedFile() file) {
     if (!file) {
       throw new BadRequestException('File is not provided or invalid');
     }
+    const { filename, size, mimetype } = file;
+
+    await this.contentService.create(filename, size, mimetype);
+
     return {
       message: 'File uploaded successfully',
       filePath: `/${file.filename}`,
     };
-  }
-
-  @Get()
-  findAll() {
-    return this.contentService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.contentService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateContentDto: UpdateContentDto) {
-    return this.contentService.update(+id, updateContentDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.contentService.remove(+id);
   }
 }
