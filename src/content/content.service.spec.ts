@@ -14,6 +14,7 @@ describe('ContentService', () => {
           provide: 'CONTENT_REPOSITORY',
           useValue: {
             create: jest.fn().mockResolvedValue({}),
+            findOne: jest.fn().mockResolvedValue({}),
           },
         },
       ],
@@ -64,6 +65,42 @@ describe('ContentService', () => {
       const result = await service.create(filename, size, mime);
 
       expect(result).toEqual(createdContent);
+    });
+  });
+
+  describe('findOne', () => {
+    it('should call contentsRepository.findOne with correct parameters', async () => {
+      const filename = 'test.png';
+
+      const findOneSpy = jest
+        .spyOn(contentsRepository, 'findOne')
+        .mockResolvedValue({
+          filename,
+          size: 1024,
+          mime: 'image/png',
+        } as Content);
+
+      await service.findOne(filename);
+
+      expect(findOneSpy).toHaveBeenCalledWith({
+        where: { filename },
+      });
+    });
+
+    it('should return the found content', async () => {
+      const filename = 'test.png';
+
+      const foundContent = {
+        filename,
+        size: 1024,
+        mime: 'image/png',
+      } as Content;
+
+      jest.spyOn(contentsRepository, 'findOne').mockResolvedValue(foundContent);
+
+      const result = await service.findOne(filename);
+
+      expect(result).toEqual(foundContent);
     });
   });
 });
