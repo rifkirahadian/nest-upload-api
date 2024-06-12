@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ContentController } from './content.controller';
 import { ContentService } from './content.service';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { getModelToken } from '@nestjs/sequelize';
 import { Content } from './entities/content.entity';
 
@@ -18,12 +18,14 @@ describe('ContentController', () => {
           provide: getModelToken(Content),
           useValue: {
             create: jest.fn().mockResolvedValue({}),
+            findOne: jest.fn().mockResolvedValue({}),
           },
         },
         {
           provide: 'CONTENT_REPOSITORY',
           useValue: {
             create: jest.fn().mockResolvedValue({}),
+            findOne: jest.fn().mockResolvedValue({}),
           },
         },
       ],
@@ -77,6 +79,52 @@ describe('ContentController', () => {
         message: 'File uploaded successfully',
         filePath: `/test.png`,
       });
+    });
+  });
+
+  describe('findOne', () => {
+    it('should call ContentService.findOne with correct parameters', async () => {
+      const filename = 'test.png';
+
+      const foundContent = {
+        filename,
+        size: 1024,
+        mime: 'image/png',
+      } as Content;
+
+      const findOneSpy = jest
+        .spyOn(contentService, 'findOne')
+        .mockResolvedValue(foundContent);
+
+      await controller.findOne(filename);
+
+      expect(findOneSpy).toHaveBeenCalledWith(filename);
+    });
+
+    it('should return the found content', async () => {
+      const filename = 'test.png';
+
+      const foundContent = {
+        filename,
+        size: 1024,
+        mime: 'image/png',
+      } as Content;
+
+      jest.spyOn(contentService, 'findOne').mockResolvedValue(foundContent);
+
+      const result = await controller.findOne(filename);
+
+      expect(result).toEqual(foundContent);
+    });
+
+    it('should throw NotFoundException if content is not found', async () => {
+      const filename = 'nonexistent.png';
+
+      jest.spyOn(contentService, 'findOne').mockResolvedValue(null);
+
+      await expect(controller.findOne(filename)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });
