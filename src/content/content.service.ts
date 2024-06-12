@@ -15,4 +15,10 @@ export class ContentService {
       mime,
     });
   }
+
+  findOne(filename: string): Promise<Content> {
+    return this.contentsRepository.findOne({
+      where: { filename },
+    });
+  }
 }

@@ -4,11 +4,14 @@ import {
   UseInterceptors,
   UploadedFile,
   BadRequestException,
+  Get,
+  Param,
+  NotFoundException,
 } from '@nestjs/common';
 import { ContentService } from './content.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { fileFilter, storage } from '../utils/file';
-import { ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { ApiBody } from '@nestjs/swagger';
 
 @Controller('content')
 export class ContentController {
@@ -35,7 +38,6 @@ export class ContentController {
       },
     },
   })
-  @ApiConsumes('multipart/form-data')
   async create(@UploadedFile() file) {
     if (!file) {
       throw new BadRequestException('File is not provided or invalid');
@@ -48,5 +50,15 @@ export class ContentController {
       message: 'File uploaded successfully',
       filePath: `/${file.filename}`,
     };
+  }
+
+  @Get(':filename')
+  async findOne(@Param('filename') filename: string) {
+    const content = await this.contentService.findOne(filename);
+    if (!content) {
+      throw new NotFoundException('Content not found');
+    }
+
+    return content;
   }
 }
