@@ -32,6 +32,12 @@
 $ npm install
 ```
 
+## Execute database migration
+
+```bash
+$ npx sequelize-cli db:migrate
+```
+
 ## Running the app
 
 ```bash
@@ -57,6 +63,13 @@ $ npm run test:e2e
 # test coverage
 $ npm run test:cov
 ```
+
+## API Documentation
+The Api Documentation provided at /api routes (http://localhost:3000/api)
+
+## APIs
+1.	GET: /content/:filename => Get Content: Get necessary metadata of the file.
+2.	POST: /content => Upload Content: Upload content to local storage
 
 ## Support
 
